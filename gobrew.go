@@ -26,6 +26,8 @@ const (
 	goBrewTagsApi       string = "https://raw.githubusercontent.com/kevincobain2000/gobrew/json/golang-tags.json"
 )
 
+var fileExt string = ".tar.gz"
+
 // Command ...
 type Command interface {
 	ListVersions()
@@ -71,6 +73,10 @@ var githubTags map[string][]string
 
 // NewGoBrew instance
 func NewGoBrew() GoBrew {
+	if runtime.GOOS == "windows" {
+		fileExt = ".zip"
+	}
+
 	gb.homeDir = os.Getenv("HOME")
 	gb.installDir = filepath.Join(gb.homeDir, goBrewDir)
 	gb.versionsDir = filepath.Join(gb.installDir, "versions")
@@ -528,7 +534,7 @@ func (gb *GoBrew) getVersionDir(version string) string {
 	return filepath.Join(gb.versionsDir, version)
 }
 func (gb *GoBrew) downloadAndExtract(version string) {
-	tarName := "go" + version + "." + gb.getArch() + ".tar.gz"
+	tarName := "go" + version + "." + gb.getArch() + fileExt
 
 	registryPath := defaultRegistryPath
 	if p := os.Getenv("GOBREW_REGISTRY"); p != "" {
